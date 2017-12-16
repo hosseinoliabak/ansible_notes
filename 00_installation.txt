@@ -1,0 +1,9 @@
+https://docs.ansible.com/ansible/latest/intro_installation.html
+
+sudo yum install epel-release
+sudo yum install ansible
+
+sudo pip3.6 install ansible
+
+
+cd /usr/lib/python3.6/site-packages
