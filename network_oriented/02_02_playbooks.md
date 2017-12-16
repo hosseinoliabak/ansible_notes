@@ -20,3 +20,6 @@
 ```
 * Run the playbook:
   * `ansible-playbook getarp.yml -u test -k`
+
+* Network Modules:
+  * https://docs.ansible.com/ansible/latest/list_of_network_modules.html

@@ -11,7 +11,7 @@ modules:
     * installing `python simplejason`
     * the devices that don't have python installed on such as routers and switches
 * List of modules:
-  * https://docs.ansible.com/ansible/2.4/modules_by_category.html
+  * https://docs.ansible.com/ansible/latest/modules_by_category.html
 
 Example 1:
 <pre>
