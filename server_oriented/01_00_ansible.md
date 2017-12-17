@@ -9,6 +9,7 @@ Why Ansible?
   * No programming required
   * Built-in security: uses SSH, Encrypted vault, No PKI needed
   * Extendable: URL/RESTful calls, Shell Commands, Scripts
+  * App Store is called Galaxy
 
 ### Ansible Components:
 
@@ -31,6 +32,7 @@ Why Ansible?
 Example 1:
 <pre>
 ansible all -i myfile -u test -a "/sbin/reboot"
+ansible localhost -m shell -a "cat /etc/*release*"
 </pre>
 
 Example 2:
