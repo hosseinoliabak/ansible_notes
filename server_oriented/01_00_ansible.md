@@ -18,6 +18,8 @@ Why Ansible?
 * Inventory maps hosts
 * Configuration sets Ansible parameters
 * Modules define actions
+  * Module Docs: `ansible-doc -l` to list all modules. Or `ansible-doc <name>` to get help for specific module.
+  Or `ansible-doc -s <name>` to show playbook snippet for specified plugin(s)
 * Playbooks ties everything together to coordinate multiple tasks
 * Python to build the execution
 * SSH to deliver the tasks
@@ -91,4 +93,42 @@ ansible_ssh_pass=test
 ntp-server=1.2.3.4
 </pre>
 
+### Ansible Inventory and Configuration, Working with Python3-based Systems:
+First, locate your Python 2 binary:
+<pre>
+[root@localhost ~]# whereis python
+python: /usr/bin/python <b>/usr/bin/python2.7</b> /usr/bin/python3.6-config /usr/bin/python3.6m-config /usr/bin/python2.7-config /usr/bin/python3.6m /usr/bin/python3.6 /usr/bin/python3.6m-x86_64-config /usr/lib/python2.7 /usr/lib/python3.6 /usr/lib64/python2.7 /usr/lib64/python3.6 /etc/python /usr/include/python2.7 /usr/include/python3.6m /usr/share/man/man1/python.1.gz
+</pre>
+Then, the inventory (hosts) file contains something like:
+<pre>
+192.168.50.1 ansible_python_interpreter=<b>/usr/bin/python2.7</b></pre>
 
+## Most Important Modules:
+### Copy
+* Copies a file from local box to remote system
+* Has "Backup" capability
+
+### Fetch
+* Pulls a file from remote host to local system
+* Can use md5 checksums to validate
+* Can do validation remotely
+
+### Apt Module
+* Manages installed applications on Debian-based systems
+* Can install, update, or delete packages
+* Can update entire system
+
+### Service Module
+* Can stop, start, or restart services
+* Can enable services to start on boot
+
+### Examples:
+<pre>
+ansible localhost -m yum -a "name=httpd state=present" --sudo</pre>
+
+<pre>
+- state
+        Whether to install (`present' or `installed', `latest'), or remove (`absent' or
+        `removed') a package.
+        (Choices: present, installed, latest, absent, removed)[Default: present]
+</pre>
