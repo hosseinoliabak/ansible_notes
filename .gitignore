@@ -11,4 +11,4 @@ modules.xml
 vcs.xml
 workspace.xml
 *.swp
-server_oriented/lab_environment/.vagrant/machines/*
+server_oriented/lab_environment/.vagrant/
