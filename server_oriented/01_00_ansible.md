@@ -372,3 +372,106 @@ vagrant@ac:~$ <b>cat playbook1.yaml</b>
   - name: Start MySQL
     service: name=mariadb enabled=yes state=started
 </pre>
+
+Assume that one fails let's say `db1`, and we resolved the failure cause,
+now we want to run the playbook against only that failed host not against
+all hosts on the playbook:
+<pre>
+vagrant@ac:~$ <b>cat playbook1.yaml.retry</b>
+db1
+vagrant@ac:~$ <b>ansible-playbook playbook1.yaml --limit @playbook1.yaml.retry</b></pre>
+
+### Playbook logic
+* Include files to extend playbook
+  * Breaks up long playbooks
+  * Use to add external variable files
+  * Reuse other playbooks
+* Grab output of task for another task
+  * Useful to use tasks to feed data into other tasks
+  * Useful to create custom error trapping
+* Add debug to tasks
+  * Useful to send output to screen during execution
+  * Helps to find problems
+  * `debug` accepts two parameters: `msg` and `var`
+* Prompt user during execution
+  * Creates dynamic playbooks
+* Playbook handlers
+  * Tasks with asynchronous execution
+  * Only runs tasks when notified
+  * Tasks only notify when `state=changed`
+  * Does not run until all playbook tasks have executed
+  * Most common for restarting services to load changes if changes are made
+* Templates
+  * Uses Jinja2 engine
+    * Insert variables into static files
+  * Creates and copies dynamic files
+    * Deploy custom configurations
+
+#### Lab
+Scenario:
+1. Add install decision based on your OS (Debian or RedHat)
+2. Create a template for Apache config that we installed
+3. Deploy the configuration
+4. If the configuration does change, we want to restart the service
+
+Templates:
+```bash
+vagrant@ac:~$ vi templates/index.j2
+<html>
+<body>
+<h1>Congratulations!</h1>
+<p>Nice job {{ username }}!!</p>
+</body>
+</html>
+vagrant@ac:~$ head -n1 templates/httpd.j2
+ServerRoot {{ doc_root }}
+```
+Tip: to send a copy of `httpd.con` from `web` server to `ac` ansible control machine, I used:
+<pre>
+[vagrant@web ~]$ sed '/^\s*#/d;/^$/d' /etc/httpd/conf/httpd.conf | ssh vagrant@192.168.33.10 'cat > ~/templates/httpd.j2'
+</pre>
+
+The playbook and run it:
+<pre>
+vagrant@ac:~$ <b>cat playbook2.yaml</b>
+---
+- hosts: webservers
+  sudo: yes
+  vars:
+    doc_root: /var/www/html/ansible/
+
+  vars_prompt:
+    - name: username
+      prompt: What is your name?
+  tasks:
+  - name: Ensure that Apache is installed
+    yum: name=httpd state=present
+    when: ansible_os_family == "RedHat"
+
+  - name: Start Apache Services
+    service: name=httpd enabled=yes state=started
+
+  - name: Deploy configuration file
+    template: src=templates/httpd.j2 dest=/etc/httpd/conf/httpd.conf
+    notify:
+      - Restart Apache
+
+  - name: Copy Site Files
+    template: src=templates/index.j2 dest={{ doc_root }}/index.html
+  handlers:
+    - name: Restart Apache
+      service: name=httpd state=restarted
+vagrant@ac:~$ <b>ansible-playbook playbook2.yaml</b></pre>
+
+To test
+```
+vagrant@ac:~$ curl -L 192.168.33.20/ansible
+<html>
+<body>
+<h1>Congratulations!</h1>
+<p>Nice job Hossein!!</p>
+</body>
+</html>
+```
+
+
